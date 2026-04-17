@@ -1,0 +1,5 @@
+# SQLite database file (don't commit actual data)
+data/*.db
+
+# Go build cache
+*.test
