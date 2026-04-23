@@ -17,6 +17,9 @@ func SetupProfileRoutes(profileService service.ProfileService) *http.ServeMux {
 	// GET /api/profiles - Get all profiles with optional filters
 	profileMux.HandleFunc("GET /api/profiles", profileHandler.GetAll)
 
+	// GET /api/profiles/search - Get all profiles with natural language processing
+	profileMux.HandleFunc("GET /api/profiles/search", profileHandler.Search)
+
 	// GET /api/profiles/{id} - Get profile by ID
 	profileMux.HandleFunc("GET /api/profiles/{id}", profileHandler.GetProfileByID)
 

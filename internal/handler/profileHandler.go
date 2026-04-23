@@ -85,19 +85,55 @@ func (h *ProfileHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	gender := strings.TrimSpace(r.URL.Query().Get("gender"))
-	countryID := strings.TrimSpace(r.URL.Query().Get("country_id"))
-	ageGroup := strings.TrimSpace(r.URL.Query().Get("age_group"))
+	query, err := helpers.ParseProfileQuery(r)
+	if err != nil {
+		helpers.WriteJSONError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	profiles, count, statusCode, err := h.profileService.GetAll(gender, countryID, ageGroup)
+	profiles, count, statusCode, err := h.profileService.GetAll(query)
 	if err != nil {
 		helpers.WriteJSONError(w, statusCode, err.Error())
 		return
 	}
 
-	helpers.WriteJSONSuccess(w, statusCode, map[string]interface{}{
+	helpers.WriteJSONSuccess(w, http.StatusOK, map[string]interface{}{
 		"status": "success",
-		"count":  count,
+		"page":   query.Page,
+		"limit":  query.Limit,
+		"total":  count,
+		"data":   profiles,
+	})
+}
+
+// GET /api/profiles/ssearch
+func (h *ProfileHandler) Search(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	if q == "" {
+		helpers.WriteJSONError(w, http.StatusBadRequest, "Missing or empty query")
+		return
+	}
+
+	query, err := helpers.ParseNaturalLanguage(r, q)
+	if err != nil {
+		helpers.WriteJSONError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	profiles, count, statusCode, err := h.profileService.GetAll(query)
+	if err != nil {
+		helpers.WriteJSONError(w, statusCode, err.Error())
+		return
+	}
+
+	helpers.WriteJSONSuccess(w, http.StatusOK, map[string]interface{}{
+		"status": "success",
+		"page":   query.Page,
+		"limit":  query.Limit,
+		"total":  count,
 		"data":   profiles,
 	})
 }

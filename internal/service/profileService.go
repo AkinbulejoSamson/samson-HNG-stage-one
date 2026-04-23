@@ -21,7 +21,7 @@ import (
 type ProfileService interface {
 	CreateOrRetrieveProfile(ctx context.Context, name string) (*model.Profile, bool, int, error)
 	GetProfileByID(ID string) (*model.Profile, int, error)
-	GetAll(gender, countryID, ageGroup string) ([]*model.ProfileListItem, int, int, error)
+	GetAll(query *dto.ProfileQuery) ([]*model.Profile, int, int, error)
 	Delete(id string) (int, error)
 }
 
@@ -143,8 +143,8 @@ func (s *profileService) GetProfileByID(ID string) (*model.Profile, int, error) 
 	return profile, http.StatusOK, nil
 }
 
-func (s *profileService) GetAll(gender, countryID, ageGroup string) ([]*model.ProfileListItem, int, int, error) {
-	profiles, count, err := s.profileRepository.GetProfiles(gender, countryID, ageGroup)
+func (s *profileService) GetAll(query *dto.ProfileQuery) ([]*model.Profile, int, int, error) {
+	profiles, count, err := s.profileRepository.GetProfiles(query)
 	if err != nil {
 		return nil, count, http.StatusInternalServerError, err
 	}
