@@ -193,7 +193,7 @@ func ParseNaturalLanguage(r *http.Request, q string) (*dto.ProfileQuery, error) 
 	paginate(r, query)
 
 	if !matched {
-		return nil, fmt.Errorf("Unable to interpret query")
+		return nil, fmt.Errorf("unable to interpret query")
 	}
 
 	return query, nil
