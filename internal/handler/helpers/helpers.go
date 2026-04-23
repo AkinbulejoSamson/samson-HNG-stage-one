@@ -211,16 +211,17 @@ func paginate(r *http.Request, q *dto.ProfileQuery) {
 		q.Page = 1
 	}
 
-	if v := r.URL.Query().Get("limit"); v != "" {
+	v := r.URL.Query().Get("limit")
+	q.Limit = 10
+	if v != "" {
 		val, err := strconv.Atoi(v)
-		if err != nil && val > 0 {
+		if err == nil {
 			q.Limit = val
 		}
 	}
-	if q.Limit <= 0 {
-		q.Limit = 10
-	}
-	if q.Limit > 50 {
+	if q.Limit < 1 {
+		q.Limit = 1
+	} else if q.Limit > 50 {
 		q.Limit = 50
 	}
 }
